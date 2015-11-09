@@ -3,7 +3,9 @@ var express = require('express'),
 	bodyParser = require('body-parser'); //parse body content into json
 
 //using mongoose to connect to mongodb // creates new greatBookApi collection automatically
-var db = mongoose.connect('mongodb://localhost/greatBookApi');
+//var db = mongoose.connect('mongodb://localhost/greatBookApi');
+
+var db = mongoose.connect('mongodb://mukum:sherma@ds053164.mongolab.com:53164/restful-book-api');
 
 var Book = require('./models/bookModel');
 
