@@ -12,7 +12,19 @@ var Book = require('./models/bookModel');
 var app = express();
 
 //for uploading an image
+//needs modules - npm install s3fs connect-multiparty --save
+// s3fs and connect-multiparty modules are used
 var fs = require('fs');
+var S3FS = require('s3fs');
+var s3fsImpl = new S3FS('ms-images-bucket',{
+	accessKeyId : "AKIAJZVVV5HFBZQRPDXA",
+	secretAccessKey : "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"
+});//bucket in Amazon s3
+s3fsImpl.create();
+
+var multiparty = require('connect-multiparty'),
+	multipartyMiddleware = multiparty();
+
 //var Grid = require('gridfs-stream');
 var multer = require('multer');
 
@@ -25,25 +37,47 @@ app.use(bodyParser.urlencoded({extended:true}));
 var bookRouter = express.Router();
 
 bookRouter.route('/uploads')
-	.post(function(req,res){
-	 var dirname = require('path').dirname(__dirname);
-     var filename = req.files.file.name;
-     var path = req.files.file.path;
-     var type = req.files.file.mimetype;
+.post(function(req,res){
+
+		var file = req.files.file;
+		var stream = fs.createReadStream(file.path);
+		return s3fsImpl.writeFile(file.orginalFilename,stream.then(function(){
+			fs.unlink(file.path,function(err){
+				if (err) 
+					console.log(err);
+			})
+		}));
+	})
+// bookRouter.route('/uploads')
+// 	.post(function(req,res){
+
+// 		var file = req.files.file;
+// 		var stream = fs.createReadStream(file.path);
+// 		return s3fsImpl.writeFile(file.orginalFilename,stream.then(function(){
+// 			fs.unlink(file.path,function(err){
+// 				if (err) {
+// 					console.log(err);
+// 				}
+// 			});
+// 	})
+
+	 // var dirname = require('path').dirname(__dirname);
+  //    var filename = req.files.file.name;
+  //    var path = req.files.file.path;
+  //    var type = req.files.file.mimetype;
       
-     var read_stream =  fs.createReadStream(dirname + '/' + path);
+  //    var read_stream =  fs.createReadStream(dirname + '/' + path);
  
-     var conn = req.conn;
-     var Grid = require('gridfs-stream');
-     Grid.mongo = mongoose.mongo;
+  //    var conn = req.conn;
+  //    var Grid = require('gridfs-stream');
+  //    Grid.mongo = mongoose.mongo;
  
-     var gfs = Grid(conn.db);
+  //    var gfs = Grid(conn.db);
       
-     var writestream = gfs.createWriteStream({
-        filename: filename
-    });
-     read_stream.pipe(writestream);
-	});
+  //    var writestream = gfs.createWriteStream({
+  //       filename: filename
+  //   });
+  //    read_stream.pipe(writestream);
 
 bookRouter.route('/books')
 	.post(function(req,res){
@@ -53,6 +87,17 @@ bookRouter.route('/books')
 		console.log(book);
 		res.send(book);
 	})
+	// .post(function(req,res){
+
+	// 	var file = req.files.file;
+	// 	var stream = fs.createReadStream(file.path);
+	// 	return s3fsImpl.writeFile(file.orginalFilename,stream.then(function(){
+	// 		fs.unlink(file.path,function(err){
+	// 			if (err) 
+	// 				console.log(err);
+	// 		})
+	// 	}));
+	// })
 
 	.get(function(req,res){
 		//var responseJson = {hello:"This is my api"};
