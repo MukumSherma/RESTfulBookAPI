@@ -11,6 +11,11 @@ var Book = require('./models/bookModel');
 
 var app = express();
 
+//for uploading an image
+var fs = require('fs');
+//var Grid = require('gridfs-stream');
+var multer = require('multer');
+
 var port = process.env.PORT||8000;
 
 //looks into body, if json is present, it parses it and add into req.body()
@@ -18,6 +23,27 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 
 var bookRouter = express.Router();
+
+bookRouter.route('/uploads')
+	.post(function(req,res){
+	 var dirname = require('path').dirname(__dirname);
+     var filename = req.files.file.name;
+     var path = req.files.file.path;
+     var type = req.files.file.mimetype;
+      
+     var read_stream =  fs.createReadStream(dirname + '/' + path);
+ 
+     var conn = req.conn;
+     var Grid = require('gridfs-stream');
+     Grid.mongo = mongoose.mongo;
+ 
+     var gfs = Grid(conn.db);
+      
+     var writestream = gfs.createWriteStream({
+        filename: filename
+    });
+     read_stream.pipe(writestream);
+	});
 
 bookRouter.route('/books')
 	.post(function(req,res){
@@ -27,6 +53,7 @@ bookRouter.route('/books')
 		console.log(book);
 		res.send(book);
 	})
+
 	.get(function(req,res){
 		//var responseJson = {hello:"This is my api"};
 		//res.json(responseJson);
