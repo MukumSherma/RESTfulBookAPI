@@ -80,6 +80,15 @@ app.post('/uploads',function(req,res){
   //   });
   //    read_stream.pipe(writestream);
 
+bookRouter.route('/books2')
+	.post(function(req,res){
+		var book = new Book(req.body);
+		book.save();
+		res.status(201).send(book);
+		console.log(book);
+		res.send(book);
+});
+
 bookRouter.route('/books')
 	.post(function(req,res){
 		var book = new Book(req.body);
