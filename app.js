@@ -37,8 +37,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 var bookRouter = express.Router();
 
-bookRouter.route('/uploads')
-.post(function(req,res){
+//bookRouter.route('/uploads')
+app.post('/uploads',function(req,res){
 
 		var file = req.files.file;
 		var stream = fs.createReadStream(file.path);
