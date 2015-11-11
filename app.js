@@ -24,7 +24,7 @@ s3fsImpl.create();
 
 var multiparty = require('connect-multiparty'),
 	multipartyMiddleware = multiparty();
-app.use(multipartyMiddleware);
+//app.use(multipartyMiddleware);
 
 //var Grid = require('gridfs-stream');
 var multer = require('multer');
@@ -36,9 +36,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 
 var bookRouter = express.Router();
+bookRouter.use(multipartyMiddleware);
 
-//bookRouter.route('/uploads')
-app.post('/uploads',function(req,res){
+bookRouter.route('/uploads')
+	.post(function(req,res){
 
 		var file = req.files.file;
 		var stream = fs.createReadStream(file.path);
@@ -48,7 +49,7 @@ app.post('/uploads',function(req,res){
 					console.log(err);
 			})
 		}));
-	})
+	});
 // bookRouter.route('/uploads')
 // 	.post(function(req,res){
 
