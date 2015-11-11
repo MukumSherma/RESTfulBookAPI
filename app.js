@@ -24,6 +24,7 @@ s3fsImpl.create();
 
 var multiparty = require('connect-multiparty'),
 	multipartyMiddleware = multiparty();
+app.use(multipartyMiddleware);
 
 //var Grid = require('gridfs-stream');
 var multer = require('multer');
